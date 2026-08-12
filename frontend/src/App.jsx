@@ -14,6 +14,8 @@ import Dashboard from "./pages/Dashboard";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
+import Purchases from "./pages/Purchases";
+import Transfers from "./pages/Transfers";
 
 const App = () => {
   return (
@@ -35,6 +37,16 @@ const App = () => {
               <Route
                 path="/dashboard"
                 element={<Dashboard />}
+              />
+
+              <Route
+                path="/purchases"
+                element={<Purchases />}
+              />
+
+              <Route
+                path="/transfers"
+                element={<Transfers />}
               />
             </Route>
           </Route>
