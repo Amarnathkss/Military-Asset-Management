@@ -10,6 +10,7 @@ import transferRoutes from "./routes/transferRoutes.js";
 import assignmentRoutes from "./routes/assignmentRoutes.js";
 import expenditureRoutes from "./routes/expenditureRoutes.js";
 import assetRoutes from "./routes/assetRoutes.js";
+import auditRoutes from "./routes/auditRoutes.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/api/transfers", transferRoutes);
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/expenditures", expenditureRoutes);
 app.use("/api/assets", assetRoutes);
+app.use("/api/audit-logs", auditRoutes);
 
 const PORT = process.env.PORT || 5000;
 

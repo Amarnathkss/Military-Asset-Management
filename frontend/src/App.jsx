@@ -19,6 +19,7 @@ import Transfers from "./pages/Transfers";
 import Assignments from "./pages/Assignments";
 import Expenditures from "./pages/Expenditures";
 import Inventory from "./pages/Inventory";
+import AuditLogs from "./pages/AuditLogs";
 
 const App = () => {
   return (
@@ -66,6 +67,11 @@ const App = () => {
             <Route
               path="/expenditures"
               element={<Expenditures />}
+            />
+
+            <Route
+              path="/audit-logs"
+              element={<AuditLogs />}
             />
           </Route>
 
