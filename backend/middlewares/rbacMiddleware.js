@@ -20,3 +20,18 @@ export const enforceBaseScope = (req, res, next) => {
 
     next();
 };
+
+export const enforceRequestBase = (req, res, next) => {
+    if (req.user.role === "BASE_COMMANDER") {
+        const requestedBaseId = Number(req.body.baseId);
+
+        if (requestedBaseId !== req.user.baseId) {
+            return res.status(403).json({
+                message:
+                    "Access denied: you can only operate on your assigned base.",
+            });
+        }
+    }
+
+    next();
+};
