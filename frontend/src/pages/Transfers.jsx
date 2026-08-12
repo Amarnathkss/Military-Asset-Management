@@ -1,12 +1,9 @@
-import { useState } from "react";
-import {
-    ArrowRightLeft,
-    ArrowRight,
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowRightLeft, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useAuth } from "../context/AuthContext";
-import { createTransfer } from "../services/transferService";
+import { createTransfer, getTransfers } from "../services/transferService";
 
 const Transfers = () => {
     const { user } = useAuth();
@@ -19,6 +16,9 @@ const Transfers = () => {
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [transfers, setTransfers] = useState([]);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(true);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -67,16 +67,18 @@ const Transfers = () => {
             setIsSubmitting(true);
 
             const result = await createTransfer({
-                sourceBaseId: Number(sourceBaseId),
-                destinationBaseId: Number(destinationBaseId),
-                equipmentTypeId: Number(equipmentTypeId),
-                quantity: Number(quantity),
+                sourceBaseId: Number(formData.sourceBaseId),
+                destinationBaseId: Number(formData.destinationBaseId),
+                equipmentTypeId: Number(formData.equipmentTypeId),
+                quantity: Number(formData.quantity),
             });
 
             toast.success(
                 result.message ||
                 "Transfer completed successfully!"
             );
+
+            await loadTransfers();
 
             setFormData({
                 sourceBaseId: "",
@@ -94,6 +96,28 @@ const Transfers = () => {
             setIsSubmitting(false);
         }
     };
+
+    const loadTransfers = async () => {
+        try {
+            setIsHistoryLoading(true);
+
+            const data = await getTransfers();
+
+            setTransfers(data.transfers || []);
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message ||
+                "Failed to load transfer history."
+            );
+        } finally {
+            setIsHistoryLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadTransfers();
+    }, []);
+
 
     return (
         <div className="p-6 lg:p-8">
@@ -283,6 +307,127 @@ const Transfers = () => {
                             : "Complete Transfer"}
                     </button>
                 </form>
+            </div>
+
+            <div className="mt-8 bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-200">
+                    <h2 className="text-lg font-semibold text-slate-900">
+                        Transfer History
+                    </h2>
+
+                    <p className="text-sm text-slate-500 mt-1">
+                        Previously recorded asset movements between bases.
+                    </p>
+                </div>
+
+                {isHistoryLoading ? (
+                    <div className="p-6 space-y-3">
+                        <div className="h-10 bg-slate-100 rounded animate-pulse" />
+                        <div className="h-10 bg-slate-100 rounded animate-pulse" />
+                        <div className="h-10 bg-slate-100 rounded animate-pulse" />
+                    </div>
+                ) : transfers.length === 0 ? (
+                    <div className="p-8 text-center text-slate-500">
+                        No transfer records found.
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        ID
+                                    </th>
+
+                                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        From
+                                    </th>
+
+                                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        To
+                                    </th>
+
+                                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Equipment
+                                    </th>
+
+                                    <th className="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Quantity
+                                    </th>
+
+                                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Status
+                                    </th>
+
+                                    <th className="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Date
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody className="divide-y divide-slate-100">
+                                {transfers.map((transfer) => (
+                                    <tr
+                                        key={transfer.id}
+                                        className="hover:bg-slate-50"
+                                    >
+                                        <td className="px-6 py-4 font-medium text-slate-900">
+                                            #{transfer.id}
+                                        </td>
+
+                                        <td className="px-6 py-4 text-slate-600">
+                                            {transfer.source_base_id === 1
+                                                ? "Fort Alpha"
+                                                : transfer.source_base_id === 2
+                                                    ? "Fort Bravo"
+                                                    : transfer.source_base_id === 3
+                                                        ? "Fort Charlie"
+                                                        : `Base #${transfer.source_base_id}`}
+                                        </td>
+
+                                        <td className="px-6 py-4 text-slate-600">
+                                            {transfer.destination_base_id === 1
+                                                ? "Fort Alpha"
+                                                : transfer.destination_base_id === 2
+                                                    ? "Fort Bravo"
+                                                    : transfer.destination_base_id === 3
+                                                        ? "Fort Charlie"
+                                                        : `Base #${transfer.destination_base_id}`}
+                                        </td>
+
+                                        <td className="px-6 py-4 text-slate-600">
+                                            {transfer.equipment_type_id === 1
+                                                ? "M4 Rifle"
+                                                : transfer.equipment_type_id === 2
+                                                    ? "5.56mm Ammunition"
+                                                    : transfer.equipment_type_id === 3
+                                                        ? "Humvee"
+                                                        : transfer.equipment_type_id === 4
+                                                            ? "Pistol"
+                                                            : `Equipment #${transfer.equipment_type_id}`}
+                                        </td>
+
+                                        <td className="px-6 py-4 text-right font-semibold text-slate-900">
+                                            {transfer.quantity}
+                                        </td>
+
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                                                {transfer.status}
+                                            </span>
+                                        </td>
+
+                                        <td className="px-6 py-4 text-right text-slate-500">
+                                            {new Date(
+                                                transfer.created_at
+                                            ).toLocaleDateString()}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );

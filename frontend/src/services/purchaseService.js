@@ -8,3 +8,9 @@ export const createPurchase = async (purchaseData) => {
 
     return response.data;
 };
+
+export const getPurchases = async () => {
+    const response = await api.get("/purchases");
+
+    return response.data;
+};

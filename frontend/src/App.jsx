@@ -18,6 +18,7 @@ import Purchases from "./pages/Purchases";
 import Transfers from "./pages/Transfers";
 import Assignments from "./pages/Assignments";
 import Expenditures from "./pages/Expenditures";
+import Inventory from "./pages/Inventory";
 
 const App = () => {
   return (
@@ -39,6 +40,11 @@ const App = () => {
               <Route
                 path="/dashboard"
                 element={<Dashboard />}
+              />
+
+              <Route
+                path="/inventory"
+                element={<Inventory />}
               />
 
               <Route

@@ -1,6 +1,6 @@
 import express from "express";
 
-import { createPurchase } from "../controllers/purchaseController.js";
+import { createPurchase, getPurchases } from "../controllers/purchaseController.js";
 
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 
@@ -16,6 +16,16 @@ router.post(
         "LOGISTICS_OFFICER"
     ),
     createPurchase
+);
+
+router.get(
+    "/",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "LOGISTICS_OFFICER"
+    ),
+    getPurchases
 );
 
 export default router;

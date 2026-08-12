@@ -71,3 +71,30 @@ export const createPurchase = async (req, res) => {
         client.release();
     }
 };
+
+export const getPurchases = async (req, res) => {
+    try {
+        const result = await pool.query(
+            `
+            SELECT
+                p.id,
+                p.base_id,
+                p.equipment_type_id,
+                p.quantity,
+                p.created_at
+            FROM purchases p
+            ORDER BY p.created_at DESC;
+            `
+        );
+
+        return res.status(200).json({
+            purchases: result.rows,
+        });
+    } catch (error) {
+        console.error("Get purchases error:", error);
+
+        return res.status(500).json({
+            message: "Failed to fetch purchase history.",
+        });
+    }
+};

@@ -8,3 +8,9 @@ export const createTransfer = async (transferData) => {
 
     return response.data;
 };
+
+export const getTransfers = async () => {
+    const response = await api.get("/transfers");
+
+    return response.data;
+};

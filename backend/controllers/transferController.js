@@ -118,3 +118,33 @@ export const createTransfer = async (req, res) => {
         client.release();
     }
 };
+
+export const getTransfers = async (req, res) => {
+    try {
+        const result = await pool.query(
+            `
+            SELECT
+                id,
+                source_base_id,
+                destination_base_id,
+                equipment_type_id,
+                quantity,
+                status,
+                initiated_by,
+                created_at
+            FROM transfers
+            ORDER BY created_at DESC;
+            `
+        );
+
+        return res.status(200).json({
+            transfers: result.rows,
+        });
+    } catch (error) {
+        console.error("Get transfers error:", error);
+
+        return res.status(500).json({
+            message: "Failed to fetch transfer history.",
+        });
+    }
+};

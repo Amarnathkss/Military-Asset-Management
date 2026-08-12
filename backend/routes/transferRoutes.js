@@ -1,6 +1,6 @@
 import express from "express";
 
-import { createTransfer } from "../controllers/transferController.js";
+import { createTransfer, getTransfers } from "../controllers/transferController.js";
 
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 
@@ -16,6 +16,16 @@ router.post(
         "LOGISTICS_OFFICER"
     ),
     createTransfer
+);
+
+router.get(
+    "/",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "LOGISTICS_OFFICER"
+    ),
+    getTransfers
 );
 
 export default router;

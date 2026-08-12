@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PackagePlus } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useAuth } from "../context/AuthContext";
-import { createPurchase } from "../services/purchaseService";
+import { createPurchase, getPurchases } from "../services/purchaseService";
 
 const Purchases = () => {
     const { user } = useAuth();
@@ -18,6 +18,9 @@ const Purchases = () => {
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [purchases, setPurchases] = useState([]);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(true);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -56,6 +59,8 @@ const Purchases = () => {
                 quantity: Number(formData.quantity),
             });
 
+            await loadPurchases();
+
             toast.success(
                 "Purchase recorded successfully!"
             );
@@ -77,6 +82,27 @@ const Purchases = () => {
             setIsSubmitting(false);
         }
     };
+
+    const loadPurchases = async () => {
+        try {
+            setIsHistoryLoading(true);
+
+            const data = await getPurchases();
+
+            setPurchases(data.purchases || []);
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message ||
+                "Failed to load purchase history."
+            );
+        } finally {
+            setIsHistoryLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadPurchases();
+    }, []);
 
     return (
         <div className="p-6 lg:p-8">
@@ -211,6 +237,103 @@ const Purchases = () => {
                             : "Record Purchase"}
                     </button>
                 </form>
+            </div>
+
+            <div className="mt-8 bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-200">
+                    <h2 className="text-lg font-semibold text-slate-900">
+                        Purchase History
+                    </h2>
+
+                    <p className="text-sm text-slate-500 mt-1">
+                        Previously recorded asset purchases.
+                    </p>
+                </div>
+
+                {isHistoryLoading ? (
+                    <div className="p-6 space-y-3">
+                        <div className="h-10 bg-slate-100 rounded animate-pulse" />
+                        <div className="h-10 bg-slate-100 rounded animate-pulse" />
+                        <div className="h-10 bg-slate-100 rounded animate-pulse" />
+                    </div>
+                ) : purchases.length === 0 ? (
+                    <div className="p-8 text-center text-slate-500">
+                        No purchase records found.
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        ID
+                                    </th>
+
+                                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Base
+                                    </th>
+
+                                    <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Equipment
+                                    </th>
+
+                                    <th className="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Quantity
+                                    </th>
+
+                                    <th className="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Date
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody className="divide-y divide-slate-100">
+                                {purchases.map((purchase) => (
+                                    <tr
+                                        key={purchase.id}
+                                        className="hover:bg-slate-50"
+                                    >
+                                        <td className="px-6 py-4 font-medium text-slate-900">
+                                            #{purchase.id}
+                                        </td>
+
+                                        <td className="px-6 py-4 text-slate-600">
+                                            {purchase.base_id === 1
+                                                ? "Fort Alpha"
+                                                : purchase.base_id === 2
+                                                    ? "Fort Bravo"
+                                                    : purchase.base_id === 3
+                                                        ? "Fort Charlie"
+                                                        : `Base #${purchase.base_id}`}
+                                        </td>
+
+                                        <td className="px-6 py-4 text-slate-600">
+                                            {purchase.equipment_type_id === 1
+                                                ? "M4 Rifle"
+                                                : purchase.equipment_type_id === 2
+                                                    ? "5.56mm Ammunition"
+                                                    : purchase.equipment_type_id === 3
+                                                        ? "Humvee"
+                                                        : purchase.equipment_type_id === 4
+                                                            ? "Pistol"
+                                                            : `Equipment #${purchase.equipment_type_id}`}
+                                        </td>
+
+                                        <td className="px-6 py-4 text-right font-semibold text-slate-900">
+                                            {purchase.quantity}
+                                        </td>
+
+                                        <td className="px-6 py-4 text-right text-slate-500">
+                                            {new Date(
+                                                purchase.created_at
+                                            ).toLocaleDateString()}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );

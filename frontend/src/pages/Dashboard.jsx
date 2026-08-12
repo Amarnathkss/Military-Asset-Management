@@ -18,7 +18,16 @@ const Dashboard = () => {
 
     const [metrics, setMetrics] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [filters, setFilters] = useState({ baseId: user?.role === "BASE_COMMANDER" ? String(user.baseId) : "" })
+    const [filters, setFilters] = useState({
+        baseId:
+            user?.role === "BASE_COMMANDER"
+                ? String(user.baseId)
+                : "",
+        equipmentTypeId: "",
+        startDate: "",
+        endDate: "",
+    });
+    const [isMovementModalOpen, setIsMovementModalOpen] = useState(false);
 
     const fetchMetrics = async () => {
         try {
@@ -302,21 +311,26 @@ const Dashboard = () => {
                     />
                 </div>
 
-                <div className="border-t border-slate-200 px-6 py-5">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-slate-500">
-                                Net Movement
-                            </p>
+                <div
+                    onClick={() => setIsMovementModalOpen(true)}
+                    className="cursor-pointer hover:shadow-2xl transition hover:bg-gray-100"
+                >
+                    <div className="border-t border-slate-200 px-6 py-5">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-slate-500">
+                                    Net Movement
+                                </p>
 
-                            <p className="text-xs text-slate-400 mt-1">
-                                Purchases + Transfers In − Transfers Out
+                                <p className="text-xs text-slate-400 mt-1">
+                                    Purchases + Transfers In − Transfers Out
+                                </p>
+                            </div>
+
+                            <p className="text-2xl font-bold text-slate-900">
+                                {metrics.netMovement}
                             </p>
                         </div>
-
-                        <p className="text-2xl font-bold text-slate-900">
-                            {metrics.netMovement}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -376,6 +390,94 @@ const Dashboard = () => {
                     </div>
                 </div>
             </div>
+            {/* Net Movement Modal */}
+            {isMovementModalOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+                    onClick={() => setIsMovementModalOpen(false)}
+                >
+                    <div
+                        className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900">
+                                    Net Movement
+                                </h2>
+
+                                <p className="text-sm text-slate-500 mt-1">
+                                    Breakdown of inventory movement
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() =>
+                                    setIsMovementModalOpen(false)
+                                }
+                                className="text-slate-400 hover:text-slate-700 cursor-pointer text-2xl"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        {/* Breakdown */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-600">
+                                    Purchases
+                                </span>
+
+                                <span className="font-semibold text-slate-900">
+                                    +{metrics.purchases}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-600">
+                                    Transfers In
+                                </span>
+
+                                <span className="font-semibold text-slate-900">
+                                    +{metrics.transfersIn}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-600">
+                                    Transfers Out
+                                </span>
+
+                                <span className="font-semibold text-slate-900">
+                                    -{metrics.transfersOut}
+                                </span>
+                            </div>
+
+                            {/* Total */}
+                            <div className="border-t border-slate-200 pt-4 flex items-center justify-between">
+                                <span className="font-semibold text-slate-900">
+                                    Total Net
+                                </span>
+
+                                <span className="text-xl font-bold text-slate-900">
+                                    {metrics.netMovement}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Close */}
+                        <button
+                            onClick={() =>
+                                setIsMovementModalOpen(false)
+                            }
+                            className="w-full mt-6 bg-slate-900 text-white py-2.5 rounded-lg font-semibold hover:bg-slate-800 hover:cursor-pointer"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
