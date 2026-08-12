@@ -199,3 +199,20 @@ Military-Asset-Management/
     │       └── transferService.js
     │
     └── package.json
+
+## Demo Credentials
+
+Use these accounts to test the deployed application.
+
+| Role | Username | Password |
+|---|---|---|
+| Admin | `admin_user` | `AdminPass123!` |
+| Logistics Officer | `logistics_officer` | `LogisticsPass123!` |
+| Base Commander | `commander_alpha` | `CommandPass123!` |
+
+### Role Access
+
+- **Admin** — Full system access
+- **Logistics Officer** — Inventory, purchases, transfers and related logistics operations
+- **Base Commander** — Base-specific inventory, assignments and expenditures
+- **Commander Alpha** — Restricted to **Fort Alpha**
