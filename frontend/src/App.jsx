@@ -16,6 +16,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Purchases from "./pages/Purchases";
 import Transfers from "./pages/Transfers";
+import Assignments from "./pages/Assignments";
+import Expenditures from "./pages/Expenditures";
 
 const App = () => {
   return (
@@ -49,6 +51,16 @@ const App = () => {
                 element={<Transfers />}
               />
             </Route>
+
+            <Route
+              path="/assignments"
+              element={<Assignments />}
+            />
+
+            <Route
+              path="/expenditures"
+              element={<Expenditures />}
+            />
           </Route>
 
           <Route
